@@ -1,0 +1,59 @@
+manifest_version: 1
+
+version:
+  name: v1
+  label: "version 1"
+  comment: "Initial version of Chairlift application"
+
+artifacts:
+  setup_script: setup.sql
+  readme: README.md
+  default_streamlit: ui."Dashboard"
+
+configuration:
+  log_level: debug
+  trace_level: always
+
+privileges:
+  - EXECUTE TASK:
+      description: "Permission to run warnings check task"
+
+references:
+  - sensor_readings:
+      label: "Chairlift sensor readings"
+      description: "Table that contains streaming data from chairlift sensors."
+      privileges:
+        - SELECT
+        - REFERENCES
+      object_type: TABLE
+      multi_valued: false
+      register_callback: config_code.register_single_callback
+
+  - sensors:
+      label: "Chairlift sensors"
+      description: "Table that contains a list of all sensors configured on your machinery."
+      privileges:
+        - SELECT
+        - REFERENCES
+      object_type: TABLE
+      multi_valued: false
+      register_callback: config_code.register_single_callback
+
+  - machines:
+      label: "Chairlift machines"
+      description: "Table that contains a list of all machines operating at your resort."
+      privileges:
+        - SELECT
+        - REFERENCES
+      object_type: TABLE
+      multi_valued: false
+      register_callback: config_code.register_single_callback
+
+  - consumer_warnings_generation_warehouse:
+      label: "Consumer warning check warehouse"
+      description: "Warehouse where the warning check stored procedure will be run"
+      privileges:
+        - USAGE
+      object_type: WAREHOUSE
+      multi_valued: false
+      register_callback: config_code.register_single_callback
