@@ -6,7 +6,7 @@ create application role if not exists app_viewer;
 grant application role app_viewer to application role app_admin;
 
 -- the ui schema holds all streamlits
-create or replace schema ui;
+create or alter versioned schema ui;
 
     grant usage on schema ui to application role app_viewer;
 
