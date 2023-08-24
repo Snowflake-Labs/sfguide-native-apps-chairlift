@@ -81,10 +81,11 @@ def render():
     st.set_page_config(layout="wide")
     warnings_banner()
     st.header("Warnings")
+    st.button("Dismiss all", on_click=dismiss_all)
 
     st.caption("Showing first 20")
     col1, col2 = st.columns([0.5, 0.5])
-    acknowledged_filter = col1.checkbox('Acknowledged warnings')
+    acknowledged_filter = col1.checkbox('Show acknowledged warnings')
 
     if not acknowledged_filter:
         # filters
@@ -187,6 +188,10 @@ def dismiss_selected():
         session.sql(f"""
             update warnings_data.warnings set acknowledged = true where sensor_uuid = '{val[0]}' and reading_time = '{val[1]}'
         """).collect()
+    st.session_state['selected_rows'] = {}
+
+def dismiss_all():
+    session.sql(f"update warnings_data.warnings set acknowledged = true").collect()
     st.session_state['selected_rows'] = {}
 
 if __name__ == "__main__":
