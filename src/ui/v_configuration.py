@@ -28,12 +28,9 @@ def render():
         that are out-of-bounds. A warning will be created for each discovered
         reading that does not fall within the manufacturer's specified range.
         Note that enabling the warning generation task can consume a lot of
-        credits in your Snowflake account; the warning generation logic can be
-        manually triggered once by clicking the button below instead.
+        credits in your Snowflake account; the warning generation logic can
+        instead be manually triggered by clicking the button below.
     """)
-
-    # one-time warning generation
-    st.button("Generate warnings once (takes a while)", on_click=generate_warnings_once)
 
     # warning task
     is_warning_task_enabled = check_warning_task_enabled()
@@ -44,6 +41,14 @@ def render():
     )
     if is_warning_task_enabled != new_value:
         update_warning_task_enabled(new_value)
+        st.experimental_rerun()
+
+    # one-time warning generation
+    st.button(
+        label="Generate new warnings (takes a while)",
+        on_click=generate_warnings_once,
+        disabled=is_warning_task_enabled,
+    )
 
 if __name__ == "__main__":
     if not get_is_first_time_setup_dismissed():
