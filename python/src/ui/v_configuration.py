@@ -17,7 +17,7 @@ def update_warning_task_enabled(should_enable):
     """).collect()
 
 def generate_warnings_once():
-    session.sql(f"""
+    result = session.sql(f"""
         call warnings_code.check_warnings()
     """).collect()
 

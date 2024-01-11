@@ -7,7 +7,7 @@ This Snowflake Native Application sample demonstrates how a ChairLift manufactur
 - `prepare/`: scripts to prepare the development and test accounts (roles, data)
 - `provider/`: script to create the application package with appropriate grants
 - `consumer/`: script to install the application as the consumer
-- `src/`: source files for the application
+- `python/`: Python source files for the application
 
 ## Getting started
 
@@ -36,6 +36,22 @@ Execute `prepare/provider-data.sql` as the `chairlift_provider` role. This scrip
 #### Consumer data
 
 Execute `prepare/consumer-data.sql` as the `chairlift_admin` role. This script sets up tables for machines, sensors, and their readings.
+
+## Use Snow CLI for creating and installing the application (recommended)
+
+**Note**: Snowflake CLI is in Private Preview (PrPr). For more information on enrollment in the Snowflake CLI PrPr program or to obtain the relevant documentation, please contact a Snowflake sales representative.
+
+### Create application package and install application
+Once Snowflake CLI is installed and configured, run the following command in your terminal from this project's root directory:
+```
+snow app run
+```
+
+This command will upload source files and create the application package and install the application instance automatically. 
+
+Snowflake CLI project is configured using `snowflake.yml` file.
+
+## Alternatively, you can manually create and install the application
 
 ### Create application package
 
@@ -77,6 +93,7 @@ Execute `consumer/install-app.sql` as the `chairlift_admin` role. This installs 
 
 Note that the version and/or patch values may need to be updated to install the application using a different version or patch.
 
+## Consumer workflow
 ### Consumer: Run application as chairlift_admin (snowsight)
 
 Earlier, you created two roles that have differing levels of access to the application you have just installed:
@@ -118,7 +135,12 @@ alter task chairlift_consumer_data.data.populate_reading_every_minute suspend;
 ```
 
 The application itself can be uninstalled by calling:
+```
+snow app teardown
+```
+or
 
 ```sql
 drop application chairlift_app;
 ```
+

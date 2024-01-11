@@ -1,3 +1,4 @@
+# For more information on creating manifest, go to https://docs.snowflake.com/en/developer-guide/native-apps/creating-manifest
 manifest_version: 1
 
 version:
@@ -6,9 +7,10 @@ version:
   comment: "Initial version of Chairlift application"
 
 artifacts:
-  setup_script: setup.sql
+  setup_script: setup_script.sql
   readme: README.md
   default_streamlit: ui."Dashboard"
+  extension_code: true 
 
 configuration:
   log_level: debug

@@ -168,6 +168,7 @@ def render():
             st.write(row['REASON'])
 
         with col6:
+            # TODO possible duplicate IDs
             id = row['SENSOR_UUID'] + '/' + str(row['READABLE_TIME'])
             if not acknowledged_filter:
                 args = [row['SENSOR_UUID'], row['READING_TIME'], id]

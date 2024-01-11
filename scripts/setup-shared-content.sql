@@ -1,23 +1,18 @@
--- This file is only used when installing the application package manually.
--- When using Snowflake CLI, setup-shared-content.sql will automatically be picked up by the tool (configured in snowflake.yml)
-use role chairlift_provider;
-use warehouse chairlift_wh;
+-- This file is only used with Snowflake CLI (configured in snowflake.yml)
+-- When creating the application package manually, create-package.sql will be used instead
 
--- create our application package
--- at this point, the package will not be installable because
--- it does not have a version; the version will be uploaded later
-create application package if not exists chairlift_pkg;
+-- For more information, refer to https://docs.snowflake.com/en/developer-guide/native-apps/preparing-data-content
 
 -- mark that our application package depends on an external database in
 -- the provider account. By granting "reference_usage", the proprietary data
 -- in the chairlift_provider_data database can be shared through the app
 grant reference_usage on database chairlift_provider_data
-    to share in application package chairlift_pkg;
+    to share in application package {{ package_name }};
 
 -- now that we can reference our proprietary data, let's create some views
 -- this "package schema" will be accessible inside of our setup script
-create schema if not exists chairlift_pkg.package_shared;
-use schema chairlift_pkg.package_shared;
+create schema if not exists {{ package_name }}.package_shared;
+use schema {{ package_name }}.package_shared;
 
 -- View for sensor types full data
 create view if not exists package_shared.sensor_types_view
@@ -41,10 +36,10 @@ create view if not exists package_shared.sensor_service_schedules
 
 -- these grants allow our setup script to actually refer to our views
 grant usage on schema package_shared
-  to share in application package chairlift_pkg;
+  to share in application package {{ package_name }};
 grant select on view package_shared.sensor_types_view
-  to share in application package chairlift_pkg;
+  to share in application package {{ package_name }};
 grant select on view package_shared.sensor_ranges
-  to share in application package chairlift_pkg;
+  to share in application package {{ package_name }};
 grant select on view package_shared.sensor_service_schedules
-  to share in application package chairlift_pkg;
+  to share in application package {{ package_name }};
