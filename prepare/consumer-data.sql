@@ -176,8 +176,8 @@ as
 -- Get some initial data in the readings table
 call populate_reading();
 
--- If you would like the data to be populated on a schedule, you can run:
--- alter task chairlift_consumer_data.data.populate_reading_every_minute resume;
-
--- To stop:
+-- To stop the task:
 -- alter task chairlift_consumer_data.data.populate_reading_every_minute suspend;
+
+-- If you would like the data to be populated on a schedule, you can run:
+alter task chairlift_consumer_data.data.populate_reading_every_minute resume;

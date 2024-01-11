@@ -1,0 +1,18 @@
+# This is a project definition file, a required component of the Snowflake Native Apps Project.
+# DO NOT delete this file if you intend to use snowCLI with this project.  
+
+definition_version: 1
+native_app:
+  name: chairlift
+  source_stage: code.source
+  artifacts:
+    - src: app/*
+      dest: ./
+    - src: python/src/*
+      dest: ./python/
+  package:
+    warehouse: chairlift_wh
+    scripts:
+      - scripts/setup-shared-content.sql
+  application:
+    warehouse: chairlift_wh

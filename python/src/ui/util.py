@@ -22,4 +22,3 @@ class _StreamlitClientWithLogger(permission._SnowsightClientBase):
         st.write("Compressed Request")
         st.write(super()._serialize_request(request))
         st.experimental_set_query_params(request=super()._serialize_request(request))
-
