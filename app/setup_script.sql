@@ -13,36 +13,36 @@ grant application role app_viewer to application role app_admin;
 -- so that we do not clobber state whenever we upgrade the app
 create schema if not exists config_data;
     grant usage on schema config_data to application role app_admin;
-    execute immediate from './config_data/configuration.sql';
+    execute immediate from './sql_lib/config_data-configuration.sql';
 
 -- non-versioned schema to prevent data loss on upgrade
 -- we'll also store our task(s) here
 create schema if not exists warnings_data;
     grant usage on schema warnings_data to application role app_admin;
-    execute immediate from './warnings_data/warnings_reading_cursor.sql';
-    execute immediate from './warnings_data/warnings.sql';
+    execute immediate from './sql_lib/warnings_data-warnings_reading_cursor.sql';
+    execute immediate from './sql_lib/warnings_data-warnings.sql';
 
 -- the ui schema holds all streamlits
 create or alter versioned schema ui;
     grant usage on schema ui to application role app_viewer;
-    execute immediate from './ui/v_dashboard.sql';
-    execute immediate from './ui/v_sensor_data.sql';
-    execute immediate from './ui/v_configuration.sql';
+    execute immediate from './sql_lib/ui-v_dashboard.sql';
+    execute immediate from './sql_lib/ui-v_sensor_data.sql';
+    execute immediate from './sql_lib/ui-v_configuration.sql';
 
 -- simple generic methods to register callbacks
 create or alter versioned schema config_code;
     grant usage on schema config_code to application role app_admin;
-    execute immediate from './config_code/register_single_callback.sql';
+    execute immediate from './sql_lib/config_code-register_single_callback.sql';
 
 -- we need two views for each table we want to share from the provider through the app:
 -- one set of views live in the package schema; the other set of views are defined here
 create or alter versioned schema shared_content;
-    execute immediate from './shared_content/sensor_types_view.sql';
-    execute immediate from './shared_content/sensor_ranges.sql';
-    execute immediate from './shared_content/sensor_service_schedules.sql';
+    execute immediate from './sql_lib/shared_content-sensor_types_view.sql';
+    execute immediate from './sql_lib/shared_content-sensor_ranges.sql';
+    execute immediate from './sql_lib/shared_content-sensor_service_schedules.sql';
 
 -- versioned schema to hold our stored procedures
 create or alter versioned schema warnings_code;
-    execute immediate from './warnings_code/check_warnings.sql';
-    execute immediate from './warnings_code/create_warning_check_task.sql';
-    execute immediate from './warnings_code/update_warning_check_task_status.sql';
+    execute immediate from './sql_lib/warnings_code-check_warnings.sql';
+    execute immediate from './sql_lib/warnings_code-create_warning_check_task.sql';
+    execute immediate from './sql_lib/warnings_code-update_warning_check_task_status.sql';

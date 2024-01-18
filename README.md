@@ -7,7 +7,7 @@ This Snowflake Native Application sample demonstrates how a ChairLift manufactur
 - `prepare/`: scripts to prepare the development and test accounts (roles, data)
 - `provider/`: script to create the application package with appropriate grants
 - `consumer/`: script to install the application as the consumer
-- `python/`: Python source files for the application
+- `app/`: application entry point and source files
 
 ## Getting started
 
