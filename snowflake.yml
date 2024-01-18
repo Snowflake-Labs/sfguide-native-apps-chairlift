@@ -8,8 +8,6 @@ native_app:
   artifacts:
     - src: app/*
       dest: ./
-    - src: python/src/*
-      dest: ./python/
   package:
     warehouse: chairlift_wh
     scripts:
