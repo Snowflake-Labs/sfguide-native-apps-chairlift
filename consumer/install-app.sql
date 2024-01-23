@@ -1,3 +1,7 @@
+-- Allow consumer to install application from application package
+use role chairlift_provider;
+grant install, develop on application package chairlift_pkg to role chairlift_admin;
+
 use role chairlift_admin;
 use warehouse chairlift_wh;
 
