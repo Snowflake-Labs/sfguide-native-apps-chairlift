@@ -48,3 +48,7 @@ grant select on view package_shared.sensor_ranges
   to share in application package chairlift_pkg;
 grant select on view package_shared.sensor_service_schedules
   to share in application package chairlift_pkg;
+
+-- schema where source code will be uploaded
+create schema if not exists chairlift_pkg.code;
+create stage if not exists chairlift_pkg.code.source;
