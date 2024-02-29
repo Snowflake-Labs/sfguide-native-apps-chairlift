@@ -144,3 +144,7 @@ or
 drop application chairlift_app;
 ```
 
+#### Additional resources
+
+- [Snowflake Native App Developer Toolkit](https://www.snowflake.com/snowflake-native-app-developer-toolkit/?utm_source=github&utm_medium=github&utm_campaign=na-us-en-eb-developer-toolkit-github)
+
