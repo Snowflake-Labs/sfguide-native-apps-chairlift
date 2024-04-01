@@ -9,10 +9,12 @@ native_app:
     - src: app/*
       dest: ./
   package:
+    name: chairlift_pkg
     role: chairlift_provider
     warehouse: chairlift_wh
     scripts:
       - scripts/setup-shared-content.sql
   application:
+    name: chairlift_app
     role: chairlift_admin
     warehouse: chairlift_wh
