@@ -3,12 +3,10 @@ import json
 from typing import List
 
 import streamlit as st
-from snowflake.snowpark.context import get_active_session
+from snowflake.snowpark import Session
 import snowflake.permissions as permission
 
 from util import get_app_name
-
-session = get_active_session()
 
 @dataclass
 class Reference:
@@ -29,8 +27,8 @@ def render_request_reference_button(ref: Reference, button_type: str = "primary"
         type=button_type
     )
 
-def get_app_references(show_json=False) -> List[Reference]:
-    app_name = get_app_name()
+def get_app_references(session: Session, show_json=False) -> List[Reference]:
+    app_name = get_app_name(session)
 
     refs_json = session.sql(f"select system$get_reference_definitions('{app_name}') as REFS_JSON").collect()[0]["REFS_JSON"]
     refs = json.loads(refs_json)

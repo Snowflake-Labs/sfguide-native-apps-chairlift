@@ -93,6 +93,25 @@ Execute `consumer/install-app.sql` as the `chairlift_admin` role. This installs 
 
 Note that the version and/or patch values may need to be updated to install the application using a different version or patch.
 
+## Testing
+
+We have included sample tests for Streamlits under `tests/` directory. For more information about Streamlit App Testing, please visit the official [App Testing documentation](https://docs.streamlit.io/develop/api-reference/app-testing).
+
+To run these tests, first activate the `chairlift-test` conda environment:
+```
+conda env update -f local_test_env.yml
+conda activate chairlift-test
+```
+Run the tests using pytest:
+```
+pytest -vv
+```
+Deactivate the conda environment when done:
+```
+conda deactivate
+```
+
+
 ## Consumer workflow
 ### Consumer: Run application as chairlift_admin (snowsight)
 
