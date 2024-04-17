@@ -1,7 +1,7 @@
 from typing import List, Optional, Tuple
 import datetime as dt
 import streamlit as st
-from snowflake.snowpark.context import get_active_session
+from snowflake.snowpark import Session
 
 from ui_common import warnings_banner
 from first_time_setup import get_is_first_time_setup_dismissed, \
@@ -9,14 +9,8 @@ from first_time_setup import get_is_first_time_setup_dismissed, \
 from chairlift_data import Machine, SensorType, get_machines, \
     get_sensor_types
 
-session = get_active_session()
-
-if 'selected_rows' not in st.session_state:
-    st.session_state['selected_rows'] = {}
-
-selected_rows = st.session_state['selected_rows']
-
 def get_warning_data(
+        session: Session,
         machines: Optional[List[Machine]] = None,
         sensor_types: Optional[List[SensorType]] = None,
         min_ts: Optional[Tuple[dt.date, dt.time]] = None,
@@ -77,11 +71,11 @@ def get_warning_data(
         limit 20
     """).to_pandas()
 
-def render():
+def render(session: Session, selected_rows):
     st.set_page_config(layout="wide")
-    warnings_banner()
+    warnings_banner(session)
     st.header("Warnings")
-    st.button("Dismiss all", on_click=dismiss_all)
+    st.button("Dismiss all", on_click=lambda: dismiss_all(session))
 
     st.caption("Showing first 20")
     col1, col2 = st.columns([0.5, 0.5])
@@ -92,13 +86,15 @@ def render():
         col1, col2 = st.columns([0.5, 0.5])
         machines = col1.multiselect(
             'Filter by machine',
-            options=get_machines(),
+            options=get_machines(session),
             format_func=lambda machine: machine.name,
+            key='machines'
         )
         sensor_types = col2.multiselect(
             'Filter by sensor type',
-            options=get_sensor_types(),
+            options=get_sensor_types(session),
             format_func=lambda sensor_type: sensor_type.name,
+            key='sensorTypes'
         )
 
         col1, col2 = st.columns([0.5, 0.5])
@@ -117,6 +113,7 @@ def render():
         enable_ts_filter = None
 
     warning_data = get_warning_data(
+        session=session,
         machines=machines,
         sensor_types=sensor_types,
         min_ts=(from_date, from_time) if enable_ts_filter else None,
@@ -147,7 +144,7 @@ def render():
         st.caption('ACKNOWLEDGE')
         if not acknowledged_filter:
             select_all = st.checkbox(label='Select All', key='selectAll')
-            st.button("Dismiss", on_click=dismiss_selected)
+            st.button("Dismiss", on_click=lambda: dismiss_selected(session, selected_rows))
 
     for index, row in warning_data.iterrows():
         col1, col2, col3, col4, col5, col6 = st.columns(cols_width);
@@ -183,7 +180,7 @@ def render():
 
     st.session_state['selected_rows'] = selected_rows
 
-def dismiss_selected():
+def dismiss_selected(session: Session, selected_rows):
     for x in selected_rows.keys():
         val = selected_rows[x]
         session.sql(f"""
@@ -191,12 +188,18 @@ def dismiss_selected():
         """).collect()
     st.session_state['selected_rows'] = {}
 
-def dismiss_all():
+def dismiss_all(session: Session):
     session.sql(f"update warnings_data.warnings set acknowledged = true").collect()
     st.session_state['selected_rows'] = {}
 
 if __name__ == "__main__":
-    if not get_is_first_time_setup_dismissed():
-        render_first_time_setup()
+    session = Session.builder.getOrCreate()
+    if 'selected_rows' not in st.session_state:
+        st.session_state['selected_rows'] = {}
+
+    selected_rows = st.session_state['selected_rows']
+
+    if not get_is_first_time_setup_dismissed(session):
+        render_first_time_setup(session)
     else:
-        render()
+        render(session, selected_rows)

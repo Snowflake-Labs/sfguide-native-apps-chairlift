@@ -1,9 +1,8 @@
 from dataclasses import dataclass
 from typing import List
+from snowflake.snowpark import Session
 
 import streamlit as st
-from snowflake.snowpark.context import get_active_session
-session = get_active_session()
 
 @dataclass
 class Machine:
@@ -11,8 +10,8 @@ class Machine:
     name: str
 
 @st.cache_data
-def get_machines() -> List[Machine]:
-    machine_tuples = session.sql(f"""
+def get_machines(_session: Session) -> List[Machine]:
+    machine_tuples = _session.sql(f"""
         select UUID, NAME from reference('MACHINES')
     """).collect()
     return [Machine(t["UUID"], t["NAME"]) for t in machine_tuples]
@@ -25,8 +24,8 @@ class SensorType:
     max_range: float
 
 @st.cache_data
-def get_sensor_types() -> List[SensorType]:
-    sensor_type_tuples = session.sql(f"""
+def get_sensor_types(_session: Session) -> List[SensorType]:
+    sensor_type_tuples = _session.sql(f"""
         select ID, NAME, MIN_RANGE, MAX_RANGE
         from shared_content.SENSOR_TYPES_VIEW
     """).collect()

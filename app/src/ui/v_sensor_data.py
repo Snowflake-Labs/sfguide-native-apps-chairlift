@@ -5,7 +5,7 @@ import datetime as dt
 import altair as alt
 import pandas as pd
 import streamlit as st
-from snowflake.snowpark.context import get_active_session
+from snowflake.snowpark import Session
 
 from ui_common import warnings_banner
 from first_time_setup import get_is_first_time_setup_dismissed, \
@@ -38,13 +38,12 @@ class Filters:
     only_alerts: Optional[bool]
 
 
-session = get_active_session()
-
 st.set_page_config(layout="wide")
 
 
 @st.cache_data
 def get_sensor_data(
+    _session: Session,
     filters: Optional[Filters] = None
 ) -> pd.DataFrame:
     """
@@ -77,7 +76,7 @@ def get_sensor_data(
 
     where_clause = f"where {' and '.join(where_predicates)}" if where_predicates else ""
 
-    return session.sql(f"""
+    return _session.sql(f"""
         select 
             reading.reading_time as ts,
             machine.name as machine_name,
@@ -105,17 +104,19 @@ def get_sensor_data(
             sensor_name asc
     """).to_pandas()
 
-def render_common_filters():
+def render_common_filters(session: Session):
     col1, col2 = st.columns([0.5, 0.5])
     machines = col1.multiselect(
         'Filter by machine',
-        options=get_machines(),
+        options=get_machines(session),
         format_func=lambda machine: machine.name,
+        key='machines'
     )
     sensor_types = col2.multiselect(
         'Filter by sensor type',
-        options=get_sensor_types(),
+        options=get_sensor_types(session),
         format_func=lambda sensor_type: sensor_type.name,
+        key='sensorTypes'
     )
 
     col1, col2 = st.columns([0.5, 0.5])
@@ -139,7 +140,7 @@ def render_common_filters():
 def render_table(_filters: Filters, sensor_data: pd.DataFrame):
     st.dataframe(
         sensor_data,
-        use_container_width=True,
+        use_container_width=True
     )
 
 def warning_line(y: float):
@@ -150,11 +151,10 @@ def warning_line(y: float):
         strokeDash=[5, 5],  # 5px dash, 5px gap
     ).encode(y='y')
 
-def render_graph(filters: Filters, sensor_data: pd.DataFrame):
+def render_graph(session: Session, filters: Filters, sensor_data: pd.DataFrame):
     # one chart for each sensor type, with min / max lines
     charts = []
-    for sensor_type in get_sensor_types():
-
+    for sensor_type in get_sensor_types(session):
         # if there's no data for this graph, don't generate it
         if len(sensor_data[(sensor_data['SENSOR_NAME'] == sensor_type.name)]) == 0:
             continue
@@ -193,19 +193,20 @@ def render_graph(filters: Filters, sensor_data: pd.DataFrame):
                 use_container_width=True,
             )
 
-def render():
-    warnings_banner()
+def render(session: Session):
+    warnings_banner(session)
     st.header("Sensor data")
-    filters = render_common_filters()
-    sensor_data = get_sensor_data(filters)
+    filters = render_common_filters(session)
+    sensor_data = get_sensor_data(session, filters)
 
     graph_tab, table_tab = st.tabs(["Plotted over time", "Raw sensor readings"])
-    with graph_tab: render_graph(filters, sensor_data)
+    with graph_tab: render_graph(session, filters, sensor_data)
     with table_tab: render_table(filters, sensor_data)
 
 
 if __name__ == "__main__":
-    if not get_is_first_time_setup_dismissed():
-        render_first_time_setup()
+    session = Session.builder.getOrCreate()
+    if not get_is_first_time_setup_dismissed(session):
+        render_first_time_setup(session)
     else:
-        render()
+        render(session)
