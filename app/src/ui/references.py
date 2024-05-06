@@ -13,6 +13,7 @@ class Reference:
     name: str
     label: str
     description: str
+    object_type: str
     bound_alias: str
 
 def render_request_reference_button(ref: Reference, button_type: str = "primary") -> None:
@@ -20,7 +21,7 @@ def render_request_reference_button(ref: Reference, button_type: str = "primary"
     :param type: "primary" or "secondary"
     """
     st.button(
-        f"Select {ref.name} table ↗",
+        f"Select {ref.name} {ref.object_type.lower()} ↗",
         on_click=permission.request_reference,
         args=[ref.name],
         key=ref.name,
@@ -42,7 +43,7 @@ def get_app_references(session: Session, show_json=False) -> List[Reference]:
     for row in refs:
         bound_alias = row["bindings"][0]["alias"] if row["bindings"] else None
         references.append(
-            Reference(row["name"], row["label"], row["description"], bound_alias)
+            Reference(row["name"], row["label"], row["description"], row["object_type"], bound_alias)
         )
 
     return references
